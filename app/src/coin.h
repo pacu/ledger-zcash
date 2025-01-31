@@ -45,6 +45,8 @@ extern "C" {
 // compressed key
 #define PK_LEN_SECP256K1 33u
 
+#define LEN_CHAIN_CODE 32u
+#define ACCOUNT_PK_LEN (PK_LEN_SECP256K1 + LEN_CHAIN_CODE)
 // sapling address [11+32]
 #define ADDR_LEN_SAPLING 43u
 
@@ -64,12 +66,13 @@ extern "C" {
 #define APDU_DATA_LENGTH_GET_ADDR_SAPLING 4   // ZIP32-path
 #define APDU_DATA_LENGTH_GET_DIV_LIST     15  // ZIP32-path + 11-byte index
 #define APDU_DATA_LENGTH_GET_ADDR_DIV     15  // ZIP32-path + 11-byte div
-
+#define APDU_DATA_LENGTH_GET_T_ACCOUNT_PK ACCOUNT_PK_LEN // ZIP32-ChainCode + 33-byte Public Key
 #define INS_GET_VERSION                   0x00
 #define INS_GET_ADDR_SECP256K1            0x01
 #define INS_GET_ADDR_SAPLING_DIV          0x10
 #define INS_GET_ADDR_SAPLING              0x11
 #define INS_GET_UNIFIED_ADDR_SECP256K1    0x13
+#define INS_GET_T_ACCOUNT_PK              0x14
 
 #define INS_GET_DIV_LIST                  0x09
 

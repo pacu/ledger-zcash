@@ -24,7 +24,7 @@ use crate::{cryptoops, zip32};
 
 #[inline(never)]
 // Calculates I based on https://zips.z.cash/zip-0032#sapling-master-key-generation
-fn zip32_master_key_i() -> Zip32MasterKey {
+pub (crate) fn zip32_master_key_i() -> Zip32MasterKey {
     let seed = crate::bolos::c_device_seed();
 
     Zip32MasterKey::from_bytes(&blake2b64_with_personalization(

@@ -68,6 +68,11 @@ typedef struct {
     uint8_t address[50];
 } __attribute__((packed)) answer_t;
 
+typedef struct {
+    uint8_t publicKey[PK_LEN_SECP256K1];
+    uint8_t chainCode[LEN_CHAIN_CODE];
+} __attribute__((packed)) account_pub_key_t;
+
 zxerr_t ripemd160(uint8_t *in, uint16_t inLen, uint8_t *out) {
     if (in == NULL || out == NULL) {
         return zxerr_no_data;
@@ -146,6 +151,31 @@ catch_cx_error:
     }
 
     return error;
+}
+
+
+// handleGetAddrSecp256K1
+// NOTE: Uses global hdPath / HDPATH_LEN_DEFAULT (indirectly)
+zxerr_t crypto_fillAccount_PubKey(uint8_t *buffer, uint16_t buffer_len, uint16_t *replyLen) {
+    io_seproxyhal_io_heartbeat();
+    if (buffer_len < sizeof(account_pub_key_t)) {
+        return zxerr_unknown;
+    }
+
+    zemu_log_stack("crypto_fillAccount_PubKey");
+
+    *replyLen = 0;
+    MEMZERO(buffer, buffer_len);
+    account_pub_key_t *const answer = (account_pub_key_t *)buffer;
+
+    CHECK_ZXERR(crypto_extractPublicKey(answer->publicKey, sizeof_field(account_pub_key_t, publicKey)));
+    io_seproxyhal_io_heartbeat();
+
+    zip32_chain_code(answer->chainCode);
+
+    io_seproxyhal_io_heartbeat();    
+    *replyLen = PK_LEN_SECP256K1 + outLen;
+    return zxerr_ok;
 }
 
 // handleGetAddrSecp256K1

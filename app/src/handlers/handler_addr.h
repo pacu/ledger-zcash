@@ -34,6 +34,39 @@
 #include "view_internal.h"
 #include "zxmacros.h"
 
+__Z_INLINE void handleGetAccPubKey(volatile uint32_t *flags, volatile uint32_t *tx, uint32_t rx, bool isUnified) {
+    ZEMU_LOGF(100, "----[handleGetAccPubKey]\n");
+    *tx = 0;
+
+    if (rx < APDU_MIN_LENGTH) {
+        ZEMU_LOGF(100, "rx: %d\n", rx);
+        THROW(APDU_CODE_COMMAND_NOT_ALLOWED);
+    }
+
+    extractHDPathTransparent(rx, OFFSET_DATA, isUnified);
+
+    uint8_t requireConfirmation = G_io_apdu_buffer[OFFSET_P1];
+    uint16_t replyLen = 0;
+
+    zxerr_t err = crypto_fillAddress_secp256k1(G_io_apdu_buffer, IO_APDU_BUFFER_SIZE - 2, &replyLen);
+    if (err != zxerr_ok) {
+        ZEMU_LOGF(100, "Err: %d\n", err);
+        *tx = 0;
+        THROW(APDU_CODE_DATA_INVALID);
+    }
+
+    action_addrResponse.len = replyLen;
+
+    
+    if (requireConfirmation) {
+        view_review_init(addr_getItem, addr_getNumItems, app_reply_address);
+        view_review_show(REVIEW_ADDRESS);
+        *flags |= IO_ASYNCH_REPLY;
+        return;
+    }
+    *tx = replyLen;
+    THROW(APDU_CODE_OK);
+}
 __Z_INLINE void handleGetAddrSecp256K1(volatile uint32_t *flags, volatile uint32_t *tx, uint32_t rx, bool isUnified) {
     ZEMU_LOGF(100, "----[handleGetAddrSecp256K1]\n");
     *tx = 0;

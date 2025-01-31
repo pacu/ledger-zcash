@@ -73,6 +73,10 @@ void handleApdu(volatile uint32_t *flags, volatile uint32_t *tx, uint32_t rx) {
                     break;
                 }
 
+                case INS_GET_T_ACCOUNT_PK: {
+                    CHECK_PIN_VALIDATED()
+                }
+
                 case INS_GET_IVK: {
                     CHECK_PIN_VALIDATED()
                     handleGetKeyIVK(flags, tx, rx);

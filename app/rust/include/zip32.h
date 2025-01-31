@@ -15,6 +15,8 @@ void diversifier_find_valid(uint32_t zip32_account, uint8_t *default_diversifier
 
 //////////////////////////////////
 
+void zip32_chain_code(uint8_t *chain_code_ptr); 
+
 void zip32_child_ask_nsk(uint32_t account, uint8_t *ask, uint8_t *nsk);
 
 void zip32_child_proof_key(uint32_t account, uint8_t *ak_ptr, uint8_t *nsk_ptr);
